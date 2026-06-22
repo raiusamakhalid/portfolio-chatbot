@@ -9,8 +9,10 @@ const app = express();
 
 const corsOptions = {
     origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'x-api-key'],
 };
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 
