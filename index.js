@@ -12,7 +12,7 @@ const corsOptions = {
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'x-api-key'],
 };
-app.options('*', cors(corsOptions));
+app.options('/chat', cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
 
