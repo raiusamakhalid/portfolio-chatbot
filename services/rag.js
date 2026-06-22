@@ -10,7 +10,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const embedModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
 // Groq — used to generate the final streamed answer
-const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+let pinecone;
 const llm = new ChatGroq({ model: "llama-3.3-70b-versatile" });
 
 // Fixed retrieval queries — always fetched alongside the user's question
@@ -30,6 +30,7 @@ async function embedText(text) {
  * @param {(chunk: string) => void} [onChunk] - Optional callback for each streamed token
  */
 async function askQuestion(question, onChunk) {
+    if (!pinecone) pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
     const index = pinecone.Index(process.env.PINECONE_INDEX);
 
     // Embed all three queries in parallel before hitting Pinecone
