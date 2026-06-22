@@ -1,4 +1,5 @@
 const fs = require("fs");
+const path = require("path");
 const pdf = require("pdf-parse");
 
 const { Pinecone } = require("@pinecone-database/pinecone");
@@ -6,6 +7,8 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { RecursiveCharacterTextSplitter } = require("@langchain/textsplitters");
 
 require("dotenv").config();
+
+const CV_PATH = path.join(__dirname, "../data/cv.pdf");
 
 async function ingest() {
     const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
@@ -26,15 +29,19 @@ async function ingest() {
 
     const index = pinecone.Index(process.env.PINECONE_INDEX);
 
+    // Clear existing vectors so stale chunks don't linger after CV updates
+    console.log("Clearing existing vectors...");
+    await index.deleteAll();
+
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const embedModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
 
-    const dataBuffer = fs.readFileSync("./data/cv.pdf");
+    const dataBuffer = fs.readFileSync(CV_PATH);
     const data = await pdf(dataBuffer);
 
     const splitter = new RecursiveCharacterTextSplitter({
         chunkSize: 1000,
-        chunkOverlap: 200
+        chunkOverlap: 200,
     });
 
     const chunks = await splitter.createDocuments([data.text]);
@@ -47,7 +54,7 @@ async function ingest() {
             records: [{
                 id: `chunk-${i}`,
                 values: vector,
-                metadata: { text: chunks[i].pageContent }
+                metadata: { text: chunks[i].pageContent },
             }]
         });
 
@@ -57,4 +64,9 @@ async function ingest() {
     console.log("CV uploaded to Pinecone!");
 }
 
-ingest();
+// Allow direct run: node scripts/ingest.js
+if (require.main === module) {
+    ingest().catch(console.error);
+}
+
+module.exports = ingest;
