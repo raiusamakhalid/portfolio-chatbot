@@ -7,10 +7,12 @@ const syncIfChanged = require("./services/cvSync");
 
 const app = express();
 
-app.use(cors({
+const corsOptions = {
     origin: '*',
     allowedHeaders: ['Content-Type', 'x-api-key'],
-}));
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (req, res) => res.json({ status: "ok" }));
