@@ -13,6 +13,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
+app.get("/", (req, res) => res.json({ status: "ok" }));
+
 app.post("/chat", authGuard, async (req, res) => {
     try {
         res.setHeader("Content-Type", "text/event-stream");
