@@ -31,11 +31,10 @@ app.post("/chat", authGuard, async (req, res) => {
     }
 });
 
-async function start() {
-    await syncIfChanged();
-    app.listen(5000, () => {
-        console.log("Server running on 5000");
-    });
+if (require.main === module) {
+    syncIfChanged()
+        .then(() => app.listen(5000, () => console.log("Server running on 5000")))
+        .catch(console.error);
+} else {
+    module.exports = app;
 }
-
-start().catch(console.error);
