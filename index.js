@@ -4,13 +4,14 @@ require("dotenv").config();
 const askQuestion = require("./services/rag");
 const authGuard = require("./guards/authGuard");
 const syncIfChanged = require("./services/cvSync");
-const { corsOptions } = require("./config/cors");
 
 const app = express();
 
-// CORS before auth — preflight OPTIONS never sends x-api-key
+const corsOptions = {
+    origin: '*',
+    allowedHeaders: ['Content-Type', 'x-api-key'],
+};
 app.use(cors(corsOptions));
-app.options("/chat", cors(corsOptions));
 app.use(express.json());
 
 app.get("/", (req, res) => res.json({ status: "ok" }));

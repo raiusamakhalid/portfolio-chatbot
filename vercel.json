@@ -1,16 +1,5 @@
 {
-  "headers": [
-    {
-      "source": "/chat",
-      "headers": [
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, x-api-key" },
-        { "key": "Access-Control-Max-Age", "value": "86400" }
-      ]
-    }
-  ],
   "rewrites": [
-    { "source": "/chat", "destination": "/api/chat" },
     { "source": "/(.*)", "destination": "/api/index" }
   ]
 }
